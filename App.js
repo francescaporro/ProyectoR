@@ -6,7 +6,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import HomeScreen from './src/screen/Home';
-import List from './src/screen/List';
+import Papelera from './src/screen/Papelera';
 import API from './src/utils/api';
 
 const Drawer = createDrawerNavigator();
@@ -20,8 +20,6 @@ class App extends Component {
   async componentDidMount() {
     const fichas = await API.getFichas();
     await AsyncStorage.setItem('tarjetas', JSON.stringify(fichas));
-    let json = []
-    await AsyncStorage.setItem('papelera', JSON.stringify(json));
   }
   componentWillUnmount() {
     
@@ -33,7 +31,7 @@ class App extends Component {
       <NavigationContainer>
       <Drawer.Navigator initialRouteName="Home">
         <Drawer.Screen name="Home" component={HomeScreen} />
-        <Drawer.Screen name="List" component={List} />
+        <Drawer.Screen name="Papelera" component={Papelera} />
       </Drawer.Navigator>
     </NavigationContainer>
     );
