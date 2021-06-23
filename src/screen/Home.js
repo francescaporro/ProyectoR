@@ -50,10 +50,13 @@ class HomeScreen extends Component{
     getTarjetas = async (registros) => {
 
       const fichas = await API.getFichas(registros);
-
+      //console.log(fichas)
       var tarjetas = await AsyncStorage.getItem("tarjetas");
-      tarjetas = JSON.parse(tarjetas)
-
+      if (tarjetas !=null) {
+            tarjetas = JSON.parse(tarjetas)
+      }else{
+        tarjetas = [];    
+      }
       for (var i = 0; i < fichas.length; i++) {
         tarjetas.push(fichas[i]);        
       }
@@ -130,7 +133,12 @@ class HomeScreen extends Component{
         return currentObject.email !== item.email;
       });
       var papelera = await AsyncStorage.getItem("papelera");
-      papelera = JSON.parse(papelera)
+      if (papelera != null) { 
+        papelera = JSON.parse(papelera);
+      }else{
+        papelera = []
+      }
+      
       papelera.push(item);
       await AsyncStorage.setItem('papelera', JSON.stringify(papelera));
       console.log(papelera)
