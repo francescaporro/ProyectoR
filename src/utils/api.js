@@ -1,10 +1,10 @@
-const URL_API  = 'https://randomuser.me/api/?results=20';
+const URL_API  = 'https://randomuser.me/api/?results=';
 
 class Api{
 
-	async getFichas(){
+	async getFichas(registros){
 		const time = new Date().getTime();
-		const query = await fetch(URL_API);
+		const query = await fetch(URL_API+registros);
 		let data = await query.json();
         //console.log(data["results"])  
 		return data["results"]

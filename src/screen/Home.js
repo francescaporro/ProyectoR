@@ -1,8 +1,8 @@
 import  React,{Component} from 'react';
 
-import { View,Text, FlatList,TouchableOpacity,Modal,StyleSheet,Pressable} from 'react-native';
+import { View,Text, FlatList,TouchableOpacity,Modal,StyleSheet,Pressable,ScrollView} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ListItem, Avatar,SearchBar,Button,Header,Icon } from "react-native-elements";
+import { ListItem, Avatar,SearchBar,Button,Header,Icon,Input } from "react-native-elements";
 import filter from 'lodash.filter';
 
 import API from '../utils/api';
@@ -18,29 +18,63 @@ class HomeScreen extends Component{
           data:[],
           search:"",
           modalVisible: false,
-          detalleItem:[]
+          detalleItem:[],
+          registros:"10",
+          botton:"Cargar registros (10)"
         };
       }
 
     componentDidMount() {
-        this.getTarjetas(); 
+       this.getTarjetasStore()
     }
     componentWillUnmount() {
     }
-    getTarjetas = async () => {
-        var tarjetas = await AsyncStorage.getItem("tarjetas");
-        tarjetas = JSON.parse(tarjetas)
-        //console.log(tarjetas)
-        this.setState({
-            data:tarjetas,
-            dataFull:tarjetas,
-            loading: false,
-            name:"",
-            email:"",
-            country:"",
-            gender:"",
-            phone:""
-          });
+    getTarjetasStore = async () => {
+
+      var tarjetas = await AsyncStorage.getItem("tarjetas");
+      tarjetas = JSON.parse(tarjetas);
+
+      //console.log(tarjetas)
+      this.setState({
+          data:tarjetas,
+          dataFull:tarjetas,
+          loading: false,
+          name:"",
+          email:"",
+          country:"",
+          gender:"",
+          phone:""
+        });
+    };
+
+    getTarjetas = async (registros) => {
+
+      const fichas = await API.getFichas(registros);
+
+      var tarjetas = await AsyncStorage.getItem("tarjetas");
+      tarjetas = JSON.parse(tarjetas)
+
+      for (var i = 0; i < fichas.length; i++) {
+        tarjetas.push(fichas[i]);        
+      }
+      
+      await AsyncStorage.setItem('tarjetas', JSON.stringify(tarjetas));
+
+      var tarjetas = await AsyncStorage.getItem("tarjetas");
+      tarjetas = JSON.parse(tarjetas);
+
+      //console.log(tarjetas)
+      this.setState({
+          data:tarjetas,
+          dataFull:tarjetas,
+          loading: false,
+          name:"",
+          email:"",
+          country:"",
+          gender:"",
+          phone:""
+        });
+        alert("Registros cargados")
     };
 
     renderSeparator = () => {
@@ -100,6 +134,7 @@ class HomeScreen extends Component{
       papelera.push(item);
       await AsyncStorage.setItem('papelera', JSON.stringify(papelera));
       console.log(papelera)
+      await AsyncStorage.setItem('tarjetas', JSON.stringify(data));
       this.setState({ data})
     };
     renderItem = ({ item }) => (
@@ -136,7 +171,7 @@ class HomeScreen extends Component{
       const { modalVisible, detalleItem} = this.state;
       
         return (
-            <View>
+            <ScrollView>
                  <Modal
                   animationType="slide"
                   transparent={true}
@@ -168,13 +203,27 @@ class HomeScreen extends Component{
                   centerComponent={{ text: 'Tarjetas', style: { color: '#fff' } }}
                   rightComponent={{ icon: 'home', color: '#fff' }}
                 />
+                <Text style={{fontSize:18,margin:20}}>Número de tarjetas a importar</Text>
+                <Input
+                  placeholder="Cantidad de Registros"
+                  keyboardType = 'numeric'
+                  onChangeText={value => this.setState({ registros: value,botton:"Cargar registros ("+value+")" })}
+                  value={this.state.registros}
+                  />
+                  <Button
+                    title={this.state.botton}
+                    onPress={() => {
+                      this.getTarjetas(this.state.registros);
+                    }}
+                  />
+                <Text style={{fontSize:20,margin:20}}>Tarjetas Importadas</Text>
                 <FlatList
                     data={this.state.data}
                     renderItem={this.renderItem}
                     keyExtractor={this.keyExtractor}
                     ListHeaderComponent={this.renderHeader}
                 />
-            </View>
+            </ScrollView>
         );
       }
 }

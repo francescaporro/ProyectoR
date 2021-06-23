@@ -17,9 +17,8 @@ class App extends Component {
     super(props)
 
   }
-  async componentDidMount() {
-    const fichas = await API.getFichas();
-    await AsyncStorage.setItem('tarjetas', JSON.stringify(fichas));
+   componentDidMount() {
+    
   }
   componentWillUnmount() {
     
